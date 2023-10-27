@@ -8,140 +8,234 @@
 import Foundation
 
 class UndeadWaveManager : ObservableObject {
-    var exterior : [any Attacker] = []
-    func advanceDay(){
-        for var attacker in exterior {
-            switch attacker.status {
-            case .delayed:
-                <#code#>
-            case .normal:
-                <#code#>
-            case .agitated:
-                <#code#>
-            case .fleeing:
-                <#code#>
-            case .lingering:
-                <#code#>
-            case .seiging:
-                <#code#>
-            }
-        }
-    }
+   @Published var director : AttackDirector = AttackDirector()
+   var creator : Undead_Horde_Factory = Undead_Horde_Factory()
+   @Published var exterior : [any Attacker] = []
+   var maxDistance = 101
+   var battlePossible : Bool {
+      for attacker in exterior {
+         if attacker.distance <= 0 {
+            return true
+         }
+      }
+      return false
+   }
+   func advanceDay() {
+      if exterior.count < 1 {
+         exterior.append(creator.createHorde(.small))
+      }
+      exterior = exterior.filter { $0.distance < maxDistance }
+      for i in exterior.indices {
+         exterior[i].executeBehavior()
+      }
+      
+      director.advanceDay()
+      checkAttackDirector()
+   }
+   
+   func checkAttackDirector(){
+      if director.spawntime == true {
+         exterior.append(creator.createHorde(director.attacker_size))
+         director.resetSpawnTimer()
+      }
+   }
 }
 
 protocol Attacker : Codable {
-    var speed : Int {get set}
-    var distance : Int {get set}
-    var status : Attacker_Behavior {get set}
+   var speed : Int {get set}
+   var distance : Int {get set}
+   var status : Attacker_Behavior {get set}
+   var delayTimer : Int {get set}
+   var patience : Int {get set}
 }
 extension Attacker {
-    func normalBehavior(){
-        
-    }
+   mutating func executeBehavior(){
+      if delayTimer > 0 {
+         status = .delayed
+      }
+      switch status {
+      case .delayed :
+         delayed()
+      case .fleeing :
+         leave()
+      case .normal :
+         advance()
+      case .searching_camp :
+         searchCamp()
+      default : break
+      }
+   }
+   mutating func delayed(){
+      if delayTimer > 0 {
+         delayTimer -= 1
+      }
+      else{
+         status = .normal
+      }
+   }
+   mutating func advance(){
+      if distance-speed <= 0{
+         distance = 0
+         actInRange(playerVisible: false)
+      }else{
+         distance -= speed
+      }
+   }
+   mutating func searchCamp(){
+      if patience <= 0{
+         status = .fleeing
+      }else{
+         patience -= 1
+      }
+   }
+   mutating func agitate(){
+      speed += 2
+   }
+   mutating func leave(){
+      distance += speed
+   }
+   mutating func actInRange(playerVisible: Bool) {
+      if playerVisible {
+         status = .seiging
+      } else {
+         status = .searching_camp
+         if patience < 0 {
+            status = .fleeing
+         }else{
+            patience -= 1
+         }
+      }
+   }
+   
 }
 enum ZombieType : Codable {
-    case shambler, undead_elite, undead_ranged
+   case shambler, undead_elite, undead_ranged
 }
 enum Attacker_Behavior : Codable {
-    case delayed, normal, agitated, fleeing, lingering, seiging
-    /*
-     Delayed - Cease advancing
-     Normal - Default
-     Agitated - Grows in severity
-     Fleeing - Leave the area
-     Lingering - Lingers at the player camp
-     Seiging - Lingers at the player camp but put a timer on when the player must fight them.
-     */
+   case delayed, normal, agitated, fleeing, searching_camp, seiging
 }
-enum AttackerDirectorAction : Codable {
-    case standard, challanging, easing_off, reprieve, difficulty_spike
-        /*
-         standard - the director will not change anything about the current difficulty of the game
-         challenging - the director will gradually make the game harder
-         easing_off - the director will gradually make the game easier
-         reprieve - the director will make the game a lot easier very fast
-         difficulty_spike - the director will make the game a lot harder very fast
-         */
+
+class AttackDirector : ObservableObject {
+   enum AttackerDirectorAction : Codable {
+      case standard, challenging, easing_off, reprieve, boss_fight
+   }
+   var history : [AttackResult] = []
+   @Published var currentBehavior : AttackerDirectorAction = .standard
+   @Published var dayCount : Int = 0
+   @Published var playerTimeToPrepare = 10
+   @Published var timeLeftBeforeSpawningAttack = 10
+   var timeInBehavior = 0
+   var spawntime : Bool {
+      timeLeftBeforeSpawningAttack <= 0
+   }
+   
+   var attacker_size = HordeID.small
+   func advanceDay(){
+      if timeLeftBeforeSpawningAttack < 0{
+         resetSpawnTimer()
+      }else{
+         timeLeftBeforeSpawningAttack -= 1
+      }
+      updateDifficulty()
+   }
+   func updateDifficulty() {
+      let recentResults = history.suffix(5)  // consider the last 5 results
+      let recentDeaths = recentResults.map { $0.playerPeopleDeaths }
+      let averageDeaths = recentDeaths.isEmpty ? 0 : recentDeaths.reduce(0, +) / recentDeaths.count
+      
+      
+      if averageDeaths > 10 {
+         currentBehavior = .easing_off
+         attacker_size = .small
+      } else if averageDeaths > 5 {
+         currentBehavior = .standard
+         attacker_size = .medium
+      } else {
+         currentBehavior = .challenging
+         attacker_size = .large
+      }
+   }
+   func adapt(){
+      switch currentBehavior {
+      case .standard:
+         playerTimeToPrepare -= Int.random(in: 0...1)
+      case .challenging:
+         playerTimeToPrepare -= 2
+      case .easing_off:
+         playerTimeToPrepare += 2
+      case .reprieve:
+         playerTimeToPrepare = (playerTimeToPrepare+2) * 2
+      case .boss_fight:
+         playerTimeToPrepare = playerTimeToPrepare / 2
+      }
+   }
+   func resetSpawnTimer(){
+      //      adapt()
+      timeLeftBeforeSpawningAttack = playerTimeToPrepare
+   }
+}
+
+struct AttackResult : Codable {
+   var playerPeopleDeaths : Int
+   var date : Int
+   var typeAttack : HordeID
 }
 enum HordeID : Codable {
-    case small, medium, large
-        /*
-         standard - the director will not change anything about the current difficulty of the game
-         challenging - the director will gradually make the game harder
-         easing_off - the director will gradually make the game easier
-         reprieve - the director will make the game a lot easier very fast
-         difficulty_spike - the director will make the game a lot harder very fast
-         */
+   case small, medium, large
 }
-protocol Undead : Attacker {//This is a protocol in case we want to have different kinds of attacking factions
-    var composition : [ZombieType:Int] {get set}
-    var hordeID : HordeID {get set}
+protocol Undead : Attacker {
+   var composition : [ZombieType:Int] {get set}
+   var hordeID : HordeID {get set}
 }
 
 class Small_Horde : Undead_Horde {
-    init() {
-        super.init(hordeID : .small, composition : [.shambler : Int.random(in: 10...20)])
-    }
-    
-    required init(from decoder: Decoder) throws {
-        fatalError("init(from:) has not been implemented")
-    }
+   init() {
+      super.init(hordeID : .small, composition : [.shambler : Int.random(in: 10...20)])
+   }
+   
+   required init(from decoder: Decoder) throws {
+      fatalError("init(from:) has not been implemented")
+   }
 }
 class Medium_Horde : Undead_Horde {
-    init() {
-        super.init(hordeID : .medium, composition : [.shambler : Int.random(in: 20...30)])
-    }
-    
-    required init(from decoder: Decoder) throws {
-        fatalError("init(from:) has not been implemented")
-    }
+   init() {
+      super.init(hordeID : .medium, composition : [.shambler : Int.random(in: 20...30)])
+   }
+   
+   required init(from decoder: Decoder) throws {
+      fatalError("init(from:) has not been implemented")
+   }
 }
 class Large_Horde : Undead_Horde {
-    init() {
-        super.init(hordeID : .large, composition : [.shambler : Int.random(in: 40...50)])
-    }
-    required init(from decoder: Decoder) throws {
-        fatalError("init(from:) has not been implemented")
-    }
-}
-struct HordeData : Codable {
-    var name : String
-    var composition: [ZombieType : Int]
-    var status: Attacker_Behavior
-    var distance: Int = 100
-    var speed: Int = 10//Savev
+   init() {
+      super.init(hordeID : .large, composition : [.shambler : Int.random(in: 40...50)])
+   }
+   required init(from decoder: Decoder) throws {
+      fatalError("init(from:) has not been implemented")
+   }
 }
 class Undead_Horde : Undead {
-    var hordeID: HordeID
-    var composition: [ZombieType : Int]//Save
-    var speed: Int = 10//Save
-    var status: Attacker_Behavior = .normal//Save
-    var distance: Int = 100//Save
-    init(hordeID : HordeID,  composition : [ZombieType : Int]){
-        self.hordeID = hordeID
-        self.composition = composition
-    }
-    
+   var hordeID: HordeID
+   var composition: [ZombieType : Int]//Save
+   var speed: Int = 10//Save
+   var status: Attacker_Behavior = .normal//Save
+   var distance: Int = 100//Save
+   var delayTimer : Int = 0//Save
+   var patience = 2//Save
+   init(hordeID : HordeID,  composition : [ZombieType : Int]){
+      self.hordeID = hordeID
+      self.composition = composition
+   }
 }
 class Undead_Horde_Factory {
-    func createHorde(_ hordeID : HordeID)->any Attacker{
-        switch hordeID {
-        case .large :
-            return Large_Horde()
-        case .medium:
-            return Medium_Horde()
-        case .small:
-            return Small_Horde()
-        }
-    }
-    func specialSpawnHorde(_ hordeID : HordeID)->any Attacker{
-        switch hordeID {
-        case .large :
-            return Large_Horde()
-        case .medium:
-            return Medium_Horde()
-        case .small:
-            return Small_Horde()
-        }
-    }
+   func createHorde(_ hordeID : HordeID)->any Attacker{
+      switch hordeID {
+      case .large :
+         return Large_Horde()
+      case .medium:
+         return Medium_Horde()
+      case .small:
+         return Small_Horde()
+      }
+   }
 }

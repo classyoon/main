@@ -22,7 +22,7 @@
 		CACEC92A2AC1FED300DB2876 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		CACEC92C2AC1FED400DB2876 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CACEC92F2AC1FED400DB2876 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		CACEC9362AC1FEF000DB2876 /* UndeadWaveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndeadWaveManager.swift; sourceTree = "<group>"; };
+		CACEC9362AC1FEF000DB2876 /* UndeadWaveManager.swift */ = {isa = PBXFileReference; indentWidth = 3; lastKnownFileType = sourcecode.swift; path = UndeadWaveManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
