@@ -6,11 +6,42 @@
 //
 
 import Foundation
+class BattleManager {
+    var hordesInRange: [any Undead] = []
+    
+    func checkForBattle(exterior: [any Undead]) {
+        // Filter the hordes that are in range
+        hordesInRange = exterior.filter { $0.distance <= 0 }
+       
+    }
+    
+    func startBattle() {
+        // Code to start the battle with all hordes in range
+        // This could involve calculating the total number of enemies,
+        // deciding the order of attacks, etc.
+       
+           // Initialize a dictionary to hold the total composition of all hordes
+           var totalComposition: [ZombieType: Int] = [.shambler: 0, .undead_elite: 0, .undead_ranged: 0]
+
+           // Go through each horde in range
+           for horde in hordesInRange {
+               // Add the composition of the current horde to the total composition
+               for (type, number) in horde.composition {
+                   totalComposition[type, default: 0] += number
+               }
+           }
+
+           // Now totalComposition holds the total number of each type of zombie in the battle
+           // You can use this information to implement the battle logic
+       }
+
+    
+}
 
 class UndeadWaveManager : ObservableObject {
    @Published var director : AttackDirector = AttackDirector()
    var creator : Undead_Horde_Factory = Undead_Horde_Factory()
-   @Published var exterior : [any Attacker] = []
+   @Published var exterior : [any Undead] = []
    var maxDistance = 101
    var battlePossible : Bool {
       for attacker in exterior {
@@ -134,29 +165,10 @@ class AttackDirector : ObservableObject {
       print("Advance director")
       if dayCount%10 == 0 {
          resetSpawnTimer()
-         adjustWaveSize()
          adapt()
       }
       dayCount += 1
       timeInBehavior += 1
-   }
-   func adjustWaveSize() {
-//      print("Adjust")
-//      let recentResults = history.suffix(5)  // consider the last 5 results
-//      let recentDeaths = recentResults.map { $0.playerPeopleDeaths }
-//      let averageDeaths = recentDeaths.isEmpty ? 0 : recentDeaths.reduce(0, +) / recentDeaths.count
-//      
-//      
-//      if averageDeaths > 10 {
-//         currentBehavior = .easing_off
-//         attacker_size = .small
-//      } else if averageDeaths > 5 {
-//         currentBehavior = .standard
-//         attacker_size = .medium
-//      } else {
-//         currentBehavior = .challenging
-//         attacker_size = .large
-//      }
    }
    func changeBehavior(_ to : AttackerDirectorAction){
       currentBehavior = to
@@ -255,7 +267,7 @@ class Undead_Horde : Undead {
    }
 }
 class Undead_Horde_Factory {
-   func createHorde(_ hordeID : HordeID)->any Attacker{
+   func createHorde(_ hordeID : HordeID)->any Undead{
       switch hordeID {
       case .large :
          return Large_Horde()
