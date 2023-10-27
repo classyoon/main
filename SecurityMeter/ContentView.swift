@@ -27,6 +27,20 @@ struct ContentView: View {
             
         }
     }
+    func getBehavior()->String{
+        switch undeadWaveManager.director.currentBehavior {
+        case .boss_fight:
+            return "Boss"
+        case .challenging:
+            return "Challenging"
+        case .easing_off:
+            return "Easing"
+        case .standard:
+            return "Normal"
+        case .reprieve :
+            return "Break"
+        }
+    }
     var body: some View {
         VStack {
             Text("Undead Wave Manager")
@@ -46,7 +60,7 @@ struct ContentView: View {
             VStack{
                 Text("Time Before Spawn : \(undeadWaveManager.director.timeLeftBeforeSpawningAttack)")
                 Text("Player Time : \(undeadWaveManager.director.playerTimeToPrepare)")
-                
+                Text("Behavior: \(getBehavior())")
             }
 
             Button(action: {

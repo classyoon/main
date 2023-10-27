@@ -124,41 +124,69 @@ class AttackDirector : ObservableObject {
    @Published var dayCount : Int = 0
    @Published var playerTimeToPrepare = 10
    @Published var timeLeftBeforeSpawningAttack = 10
-   var timeInBehavior = 0
+   @Published var timeInBehavior = 0
    var spawntime : Bool {
       timeLeftBeforeSpawningAttack <= 0
    }
    
    var attacker_size = HordeID.small
    func advanceDay(){
-      if timeLeftBeforeSpawningAttack < 0{
+      print("Advance director")
+      if dayCount%10 == 0 {
          resetSpawnTimer()
-      }else{
-         timeLeftBeforeSpawningAttack -= 1
+         adjustWaveSize()
+         adapt()
       }
-      updateDifficulty()
+      dayCount += 1
+      timeInBehavior += 1
    }
-   func updateDifficulty() {
-      let recentResults = history.suffix(5)  // consider the last 5 results
-      let recentDeaths = recentResults.map { $0.playerPeopleDeaths }
-      let averageDeaths = recentDeaths.isEmpty ? 0 : recentDeaths.reduce(0, +) / recentDeaths.count
-      
-      
-      if averageDeaths > 10 {
-         currentBehavior = .easing_off
-         attacker_size = .small
-      } else if averageDeaths > 5 {
-         currentBehavior = .standard
-         attacker_size = .medium
-      } else {
-         currentBehavior = .challenging
-         attacker_size = .large
-      }
+   func adjustWaveSize() {
+//      print("Adjust")
+//      let recentResults = history.suffix(5)  // consider the last 5 results
+//      let recentDeaths = recentResults.map { $0.playerPeopleDeaths }
+//      let averageDeaths = recentDeaths.isEmpty ? 0 : recentDeaths.reduce(0, +) / recentDeaths.count
+//      
+//      
+//      if averageDeaths > 10 {
+//         currentBehavior = .easing_off
+//         attacker_size = .small
+//      } else if averageDeaths > 5 {
+//         currentBehavior = .standard
+//         attacker_size = .medium
+//      } else {
+//         currentBehavior = .challenging
+//         attacker_size = .large
+//      }
+   }
+   func changeBehavior(_ to : AttackerDirectorAction){
+      currentBehavior = to
+      timeInBehavior = 0
    }
    func adapt(){
+      print("Adapt")
+      if timeInBehavior >= 20 && currentBehavior == .standard {
+            // Generate a random number (0 or 1)
+            let randomNumber = Int.random(in: 0...1)
+            
+            // Use the random number to decide the next behavior
+            if randomNumber == 0 {
+                changeBehavior(.challenging)
+            } else {
+                changeBehavior(.easing_off)
+            }
+        }
+        
+        if timeInBehavior >= 10 && currentBehavior == .challenging {
+            changeBehavior(.standard)
+        }
+        
+        if timeInBehavior >= 10 && currentBehavior == .easing_off {
+            changeBehavior(.standard)
+        }
+
       switch currentBehavior {
       case .standard:
-         playerTimeToPrepare -= Int.random(in: 0...1)
+         break
       case .challenging:
          playerTimeToPrepare -= 2
       case .easing_off:
@@ -170,7 +198,6 @@ class AttackDirector : ObservableObject {
       }
    }
    func resetSpawnTimer(){
-      //      adapt()
       timeLeftBeforeSpawningAttack = playerTimeToPrepare
    }
 }
