@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var undeadWaveManager = UndeadWaveManager()
+    @ObservedObject var battleManager = BattleManager()
 
     func getBehavior(of : any Attacker)->String{
         switch of.status {
@@ -58,9 +59,10 @@ struct ContentView: View {
             }
 
             VStack{
-                Text("Time Before Spawn : \(undeadWaveManager.director.timeLeftBeforeSpawningAttack)")
-                Text("Player Time : \(undeadWaveManager.director.playerTimeToPrepare)")
+                Text("Time Before Spawn : \(undeadWaveManager.director.timeBeforeSpawning)")
+                Text("Player Time : \(undeadWaveManager.director.timeToPrepareForNext)")
                 Text("Behavior: \(getBehavior())")
+                Text("Spawning Attack : \(undeadWaveManager.director.spawntime.description)")
             }
 
             Button(action: {

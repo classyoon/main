@@ -13,6 +13,10 @@
 		CACEC92D2AC1FED400DB2876 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CACEC92C2AC1FED400DB2876 /* Assets.xcassets */; };
 		CACEC9302AC1FED400DB2876 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CACEC92F2AC1FED400DB2876 /* Preview Assets.xcassets */; };
 		CACEC9372AC1FEF000DB2876 /* UndeadWaveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CACEC9362AC1FEF000DB2876 /* UndeadWaveManager.swift */; };
+		CAE5990D2AEFE524005502E2 /* UndeadAttackers.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAE5990C2AEFE524005502E2 /* UndeadAttackers.swift */; };
+		CAE5990F2AEFE558005502E2 /* DifficultyDirector.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAE5990E2AEFE558005502E2 /* DifficultyDirector.swift */; };
+		CAE599112AEFE572005502E2 /* BattleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAE599102AEFE572005502E2 /* BattleManager.swift */; };
+		CAE599132AEFE590005502E2 /* Attacker.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAE599122AEFE590005502E2 /* Attacker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +27,10 @@
 		CACEC92C2AC1FED400DB2876 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CACEC92F2AC1FED400DB2876 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		CACEC9362AC1FEF000DB2876 /* UndeadWaveManager.swift */ = {isa = PBXFileReference; indentWidth = 3; lastKnownFileType = sourcecode.swift; path = UndeadWaveManager.swift; sourceTree = "<group>"; };
+		CAE5990C2AEFE524005502E2 /* UndeadAttackers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndeadAttackers.swift; sourceTree = "<group>"; };
+		CAE5990E2AEFE558005502E2 /* DifficultyDirector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DifficultyDirector.swift; sourceTree = "<group>"; };
+		CAE599102AEFE572005502E2 /* BattleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattleManager.swift; sourceTree = "<group>"; };
+		CAE599122AEFE590005502E2 /* Attacker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Attacker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,8 +64,12 @@
 			isa = PBXGroup;
 			children = (
 				CACEC9282AC1FED300DB2876 /* SecurityMeterApp.swift */,
+				CAE5990E2AEFE558005502E2 /* DifficultyDirector.swift */,
 				CACEC92A2AC1FED300DB2876 /* ContentView.swift */,
 				CACEC9362AC1FEF000DB2876 /* UndeadWaveManager.swift */,
+				CAE599122AEFE590005502E2 /* Attacker.swift */,
+				CAE599102AEFE572005502E2 /* BattleManager.swift */,
+				CAE5990C2AEFE524005502E2 /* UndeadAttackers.swift */,
 				CA5A26372ACF16ED005C6953 /* HumanAttackersLaterContent.swift */,
 				CACEC92C2AC1FED400DB2876 /* Assets.xcassets */,
 				CACEC92E2AC1FED400DB2876 /* Preview Content */,
@@ -143,9 +155,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CAE599132AEFE590005502E2 /* Attacker.swift in Sources */,
 				CACEC92B2AC1FED300DB2876 /* ContentView.swift in Sources */,
+				CAE5990F2AEFE558005502E2 /* DifficultyDirector.swift in Sources */,
+				CAE599112AEFE572005502E2 /* BattleManager.swift in Sources */,
 				CACEC9372AC1FEF000DB2876 /* UndeadWaveManager.swift in Sources */,
 				CA5A26382ACF16ED005C6953 /* HumanAttackersLaterContent.swift in Sources */,
+				CAE5990D2AEFE524005502E2 /* UndeadAttackers.swift in Sources */,
 				CACEC9292AC1FED300DB2876 /* SecurityMeterApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
